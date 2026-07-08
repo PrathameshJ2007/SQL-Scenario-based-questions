@@ -119,3 +119,12 @@ Stores all sales transactions.
 | total_amount | DECIMAL(10,2) | Final sale amount |
 
 ---
+# Schema Type
+
+- **Model:** Star Schema
+- **Fact Tables:** 1
+- **Dimension Tables:** 4
+- **Database:** MySQL
+- **Purpose:** Business Intelligence (BI), Reporting, OLAP, Dashboarding, Sales Analytics
+
+---
