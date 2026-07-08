@@ -119,6 +119,28 @@ Stores all sales transactions.
 | total_amount | DECIMAL(10,2) | Final sale amount |
 
 ---
+# Primary Keys
+
+| Table | Primary Key |
+|---------|-------------|
+| dim_customer | customer_key |
+| dim_product | product_key |
+| dim_date | date_key |
+| dim_store | store_key |
+| fact_sales | sales_id |
+
+---
+
+# Foreign Keys
+
+| Fact Table Column | References |
+|-------------------|------------|
+| customer_key | dim_customer(customer_key) |
+| product_key | dim_product(product_key) |
+| date_key | dim_date(date_key) |
+| store_key | dim_store(store_key) |
+
+---
 # Schema Type
 
 - **Model:** Star Schema
