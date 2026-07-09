@@ -34,7 +34,7 @@ Management wants to identify products that consistently sell well.
   - Total Quantity Sold
   - Total Revenue
 - Show only the **Top 10** products based on **Quantity Sold**.
-- If quantities tie, use **Revenue** as the tiebreaker.
+- If quantities tie, use **Revenue** as the tiebreaker.(Use 2 statement in orderby )
 
 ---
 
