@@ -225,10 +225,10 @@ Classify customers into spending tiers based on **Total Spending**.
 
 | Total Spending | Classification |
 |---------------|----------------|
-| > 100000 | VIP |
-| 50000 – 100000 | Premium |
-| 10000 – 50000 | Regular |
-| Below 10000 | New |
+| > 20000 | VIP |
+| 10000 – 20000 | Premium |
+| 5000 – 10000 | Regular |
+| Below 5000 | New |
 
 ---
 
