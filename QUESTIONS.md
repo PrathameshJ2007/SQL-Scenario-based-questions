@@ -17,7 +17,7 @@ The CEO wants to know which countries generated the highest revenue '2025'.
   - Total Orders
   - Average Order Value
 - Sort by **Revenue** in descending order.
-- Show only countries with **Revenue > ₹1,00,000**.
+- Show only countries with **Revenue > ₹10,000**.
 
 ---
 
