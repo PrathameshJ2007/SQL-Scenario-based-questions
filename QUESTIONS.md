@@ -7,7 +7,7 @@ These scenarios are designed like real interview or company tasks rather than te
 # Scenario 1: Sales Performance by Country
 
 ### Objective
-The CEO wants to know which countries generated the highest revenue last year.
+The CEO wants to know which countries generated the highest revenue '2025'.
 
 ### Task
 
@@ -17,7 +17,7 @@ The CEO wants to know which countries generated the highest revenue last year.
   - Total Orders
   - Average Order Value
 - Sort by **Revenue** in descending order.
-- Show only countries with **Revenue > ₹5,00,000**.
+- Show only countries with **Revenue > ₹1,00,000**.
 
 ---
 
