@@ -27,7 +27,7 @@ LEFT JOIN dim_product P ON F.product_key = P.product_key
 GROUP BY 
 	P.product_name,
     P.category
-ORDER BY Total_sold desc
+ORDER BY Total_sold DESC, Total_revenue DESC
 LIMIT 10;
 
 -- Scenario 3: Weekend vs Weekday Analysis
@@ -48,7 +48,7 @@ FROM
 -- Scenario 4: Customer Lifetime Value
 SELECT
 	concat_WS(' ' , C.first_name , C.last_name) as Name ,
-    sum(quantity_sold) AS Total_Orders,
+    count(*) AS Total_Orders,
     sum(total_amount) AS Total_Amount_Spent,
     avg(total_amount) AS Average_Order_Value,
     dense_rank() OVER ( ORDER BY sum(total_amount) DESC)
@@ -70,7 +70,7 @@ SELECT
         2
     ) AS revenue_growth_pct,
     SUM(SUM(total_amount)) OVER (
-        ORDER BY d.month_name
+        ORDER BY  d.month_name
     ) AS running_total_revenue
     
 FROM 	
@@ -163,15 +163,23 @@ GROUP BY
 WHERE ranking= 1 ;
 
 -- Scenario 11: Revenue Leaderboard
+WITH customer_revenue AS (
+    SELECT
+        CONCAT(C.first_name, ' ', C.last_name) AS Name,
+        SUM(F.total_amount) AS Revenue
+    FROM fact_sales F
+    LEFT JOIN dim_customer C
+        ON F.customer_key = C.customer_key
+    GROUP BY C.first_name, C.last_name
+)
+
 SELECT
-	CONCAT(C.first_name , ' ' , C.last_name) AS Name,
-    SUM(F.total_amount) as Revenue,
-    dense_rank() over (order by (SUM(F.total_amount) )desc)  AS RANKING,
-	lag(SUM(F.total_amount)) over (Order by (SUM(F.total_amount) )desc) AS PREV_REVENUE
-FROM
-	fact_sales F
-LEFT JOIN dim_customer C on F.customer_key = C.customer_key
-group by C.first_name , C.last_name;
+    Name,
+    Revenue,
+    DENSE_RANK() OVER (ORDER BY Revenue DESC) AS Ranking,
+    LAG(Revenue) OVER (ORDER BY Revenue DESC) AS Prev_Revenue,
+    Revenue - LAG(Revenue) OVER (ORDER BY Revenue DESC) AS Revenue_Difference
+FROM customer_revenue;
 
 -- Scenario 12: Products Never Sold
 SELECT
@@ -222,7 +230,7 @@ WHERE revenue_growth_pct > 0;
 -- Scenario 15: Highest Revenue Day
 SELECT
 	 D.date,
-	SUM(F.quantity_sold) AS Total_Orders,
+	COUNT(*) AS Total_Orders,
 	SUM(F.total_amount) AS Total_Revenue,
 	ROUND(AVG(F.quantity_sold),2) AS Average_Order_Value
 FROM 
@@ -241,7 +249,7 @@ SELECT
 		when (sum(f.total_amount) > 20000 ) THEN 'VIP'
         when (sum(f.total_amount) > 10000 AND sum(f.total_amount) < 20000) THEN 'PREMIUM'
         when (sum(f.total_amount) > 5000 AND SUM(f.total_amount) < 10000) THEN 'REGULAR'
-        ELSE 'NEW'
+        ELSE 'NEW'	
         END
         ) AS Classification
 FROM dim_customer c
