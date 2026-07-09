@@ -311,51 +311,6 @@ Use it inside a query that displays:
 
 ---
 
-# Bonus Challenges (Interview Level)
-
-## Bonus 1: Top 3 Customers from Every Country
-
-Find the **Top 3 customers** from every country.
-
----
-
-## Bonus 2: Increasing Monthly Sales
-
-Find products whose sales increased **every month** for the **last three months**.
-
----
-
-## Bonus 3: Always Above Average
-
-Find customers whose **every purchase amount** is above the **overall average purchase amount**.
-
----
-
-## Bonus 4: Complete Monthly Revenue Report
-
-Generate a report showing:
-
-- Current Month Revenue
-- Previous Month Revenue
-- Difference
-- Running Total
-- Ranking
-
-All in **one query**.
-
----
-
-## Bonus 5: Advanced Stored Procedure
-
-Create a Stored Procedure that accepts:
-
-- Start Date
-- End Date
-- Category
-
-Return complete sales statistics for the selected period.
-
----
 
 # Recommended Difficulty Progression
 
