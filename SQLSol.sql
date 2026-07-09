@@ -172,3 +172,49 @@ FROM
 	fact_sales F
 LEFT JOIN dim_customer C on F.customer_key = C.customer_key
 group by C.first_name , C.last_name;
+
+-- Scenario 12: Products Never Sold
+SELECT
+    p.product_id,
+    p.product_name,
+    p.category
+FROM dim_product p
+LEFT JOIN fact_sales f
+    ON p.product_key = f.product_key
+WHERE f.product_key IS NULL
+ORDER BY p.product_name;
+
+-- Scenario 13: Customers Without Purchases
+SELECT
+    CONCAT(C.first_name , ' ' , C.last_name) AS Name , 
+    c.email,
+    c.join_date
+FROM dim_customer c
+LEFT JOIN fact_sales f
+    ON c.customer_key = f.customer_key
+WHERE f.customer_key IS NULL
+ORDER BY c.join_date;
+
+-- Scenario 14: Consecutive Growth
+WITH CTE_TABLE AS (
+SELECT
+	D.month_name ,
+    SUM(total_amount) as Month ,
+    LAG(sum(total_amount)) OVER (order by d.month_name) as prev_month ,
+    ROUND(
+        (
+            (SUM(total_amount) - LAG(SUM(total_amount)) OVER (ORDER BY d.month_name))
+            * 100.0
+        ) / LAG(SUM(total_amount)) OVER (ORDER BY d.month_name),
+        2
+    ) AS revenue_growth_pct,
+    SUM(SUM(total_amount)) OVER (
+        ORDER BY d.month_name
+    ) AS running_total_revenue
+    
+FROM 	
+	fact_sales F
+LEFT JOIN dim_date D ON F.date_key = D.date_key
+GROUP BY D.month_name) 
+SELECT * FROM CTE_TABLE 
+WHERE revenue_growth_pct > 0;
