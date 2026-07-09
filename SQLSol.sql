@@ -218,3 +218,114 @@ LEFT JOIN dim_date D ON F.date_key = D.date_key
 GROUP BY D.month_name) 
 SELECT * FROM CTE_TABLE 
 WHERE revenue_growth_pct > 0;
+
+-- Scenario 15: Highest Revenue Day
+SELECT
+	 D.date,
+	SUM(F.quantity_sold) AS Total_Orders,
+	SUM(F.total_amount) AS Total_Revenue,
+	ROUND(AVG(F.quantity_sold),2) AS Average_Order_Value
+FROM 
+	(fact_sales F
+		LEFT JOIN dim_date D 
+			ON  F.date_key = D.date_key )
+group by D.date
+ORDER BY Total_Revenue DESC 
+limit 5
+;
+
+-- Scenario 16: Customer Spending Classification
+SELECT
+    CONCAT(C.first_name , ' ' , C.last_name) AS Name , 
+    (CASE
+		when (sum(f.total_amount) > 20000 ) THEN 'VIP'
+        when (sum(f.total_amount) > 10000 AND sum(f.total_amount) < 20000) THEN 'PREMIUM'
+        when (sum(f.total_amount) > 5000 AND SUM(f.total_amount) < 10000) THEN 'REGULAR'
+        ELSE 'NEW'
+        END
+        ) AS Classification
+FROM dim_customer c
+LEFT JOIN fact_sales f
+    ON c.customer_key = f.customer_key
+GROUP BY C.first_name , C.last_name  ;
+
+-- Scenario 17: Revenue Above Category Average
+WITH CAT_AVG AS (
+	SELECT 
+		p.category ,
+		avg(total_amount) as revenue 
+	FROM fact_sales S
+	JOIN dim_product P on S.product_key = P.product_key
+	group by p.category 
+) ,
+PRODUCT_REV AS(
+	SELECT 
+		p.category,
+		p.product_name ,
+		avg(total_amount) as revenue 
+	FROM fact_sales S
+	JOIN dim_product P on S.product_key = P.product_key
+	group by 		p.category,p.product_name   )
+SELECT	
+	pr.product_name,
+    ca.category ,
+    pr.revenue 
+from PRODUCT_REV pr
+join CAT_AVG ca on pr.category = ca.category
+where pr.revenue > ca.revenue ; 
+
+-- Scenario 18: Sales Dashboard View
+create view vw_sales_dashboard as (
+select
+	d.date ,
+	concat(c.first_name , ' ' , c.last_name) as customer,
+	p.product_name , 
+	p.category , 
+	s.store_name,
+	f.quantity_sold as Quantity,
+	f.discount,
+	f.total_amount  as Revenue
+from fact_sales f 
+join dim_customer c on f.customer_key  = c.customer_key
+join dim_date d on f.date_key = d.date_key
+join dim_store s on f.store_key = s.store_key
+join dim_product p on f.product_key = p.product_key
+);
+select * from vw_sales_dashboard;
+
+-- Scenario 19: Stored Procedure
+delimiter // 
+	CREATE procedure GetCustomerSales(IN customerID VARCHAR(20))
+		BEGIN
+			SELECT
+				concat(c.first_name , ' ' , c.last_name) as customer,
+                count(*) as Orders,
+				SUM(f.total_amount) as revenue,
+				SUM(f.quantity_sold) as Quantity,
+                avg(f.quantity_sold) as order_value
+			from fact_sales f 
+			join dim_customer c on f.customer_key  = c.customer_key
+            where c.customer_id = customerID  
+            group by c.first_name ,  c.last_name ;
+end //
+delimiter ;
+CALL GetCustomerSales('CUST0001');
+
+-- Scenario 20: User Defined Function
+delimiter // 
+	CREATE function CalculateDiscount(amt int , disc int)
+		returns int
+		deterministic
+		BEGIN
+			return (amt*(disc/100));
+end //
+delimiter ;
+select 
+	p.product_name,
+    s.unit_price,
+    s.discount,
+    CalculateDiscount(s.unit_price , s.discount)
+FROM 
+	fact_sales s
+join dim_product p on s.product_key = p.product_key;
+
