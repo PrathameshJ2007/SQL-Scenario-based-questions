@@ -290,7 +290,7 @@ GetCustomerSales(IN customerID VARCHAR(20))
 Create a function:
 
 ```sql
-CalculateDiscountPercent()
+CalculateDiscount()
 ```
 
 ### Input
@@ -300,7 +300,7 @@ CalculateDiscountPercent()
 
 ### Output
 
-- Discount Percentage
+- Discount value
 
 Use it inside a query that displays:
 
